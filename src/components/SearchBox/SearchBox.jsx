@@ -1,14 +1,17 @@
 import { useSelector, useDispatch } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 import { changeFilter } from '../../redux/filtersSlice';
+import { selectNameFilter } from '../../redux/filtersSlice';
 import css from './SearchBox.module.css';
 
 export default function SearchBox() {
-  const filter = useSelector((state) => state.filters.name);
+  const filter = useSelector(selectNameFilter);
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
-    dispatch(changeFilter(e.target.value));
-  };
+  const debounced = useDebouncedCallback(
+    (value) => dispatch(changeFilter(value)),
+    300,
+  );
 
   return (
     <div>
@@ -16,8 +19,8 @@ export default function SearchBox() {
       <input
         className={css.search}
         type="text"
-        value={filter}
-        onChange={handleChange}
+        defaultValue={filter}
+        onChange={(e) => debounced(e.target.value)}
       />
     </div>
   );
